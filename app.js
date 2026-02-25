@@ -166,7 +166,7 @@ function renderData(dataList) {
 
         // Cabecera del Chofer
         const header = document.createElement('div');
-        header.className = 'px-4 py-4 sm:px-6 bg-slate-900/80 border-b border-border flex items-center justify-between sticky top-[72px] sm:top-[80px] z-30 backdrop-blur-xl';
+        header.className = 'px-4 py-4 sm:px-6 bg-slate-900/80 border-b border-border flex items-center justify-between backdrop-blur-xl';
         header.innerHTML = `
             <div class="flex items-center gap-4">
                 <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl bg-gradient-to-br from-indigo-500/20 to-purple-500/20 border border-indigo-500/30 flex items-center justify-center shadow-inner">
