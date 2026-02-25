@@ -259,13 +259,13 @@ function renderData(dataList) {
         let tableHtml = `
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="text-xs uppercase tracking-wider text-slate-400 bg-[#0f1523] border-y border-border shadow-inner">
-                        <th class="px-5 py-3.5 font-semibold w-[140px] text-center">Estado</th>
-                        <th class="px-5 py-3.5 font-semibold w-[80px]">ID</th>
-                        <th class="px-5 py-3.5 font-semibold max-w-[280px]">Cliente & Dirección</th>
+                    <tr class="text-xs uppercase tracking-wider text-slate-400 bg-slate-900 border-y border-border shadow-inner">
+                        <th class="px-5 py-3.5 font-semibold text-center" style="width: 140px;">Estado</th>
+                        <th class="px-5 py-3.5 font-semibold" style="width: 80px;">ID</th>
+                        <th class="px-5 py-3.5 font-semibold" style="max-width: 280px;">Cliente & Dirección</th>
                         <th class="px-5 py-3.5 font-semibold">Referencias</th>
                         <th class="px-5 py-3.5 font-semibold">Observaciones</th>
-                        <th class="px-5 py-3.5 font-semibold w-[120px]">Vendedor</th>
+                        <th class="px-5 py-3.5 font-semibold" style="width: 120px;">Vendedor</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-border text-sm">
