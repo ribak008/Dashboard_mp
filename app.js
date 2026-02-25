@@ -254,7 +254,7 @@ function renderData(dataList) {
         // VISTA ESCRITORIO (TABLA) > Mostrada en >= md (768px)
         // ============================================
         const desktopView = document.createElement('div');
-        desktopView.className = 'hidden md:block overflow-x-auto';
+        desktopView.className = 'hidden md:block overflow-x-auto mt-2';
 
         let tableHtml = `
             <table class="w-full text-left border-collapse">
