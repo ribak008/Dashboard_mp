@@ -79,7 +79,7 @@ async function loadData() {
 
     } catch (error) {
         console.error("Error cargando los datos:", error);
-        setLoading(false, true, "No se pudo conectar con el servidor. Verifica tu conexión a internet o la URL de la API.");
+        setLoading(false, true, "Error de red: " + error.message + ". Verifica si la consola (F12) tiene más detalles.");
     }
 }
 
