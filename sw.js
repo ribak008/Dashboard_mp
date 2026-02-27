@@ -1,4 +1,4 @@
-const CACHE_NAME = 'logistica-pwa-v4';
+const CACHE_NAME = 'logistica-pwa-v5';
 const urlsToCache = [
     './',
     './index.html',

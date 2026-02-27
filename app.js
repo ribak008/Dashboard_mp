@@ -455,7 +455,7 @@ function renderExterno(dataList) {
                 <tr class="text-xs uppercase tracking-wider text-slate-400 bg-slate-900 border-y border-border shadow-inner">
                     <th class="px-5 py-3.5 font-semibold text-center" style="width: 140px;">Estado</th>
                     <th class="px-5 py-3.5 font-semibold" style="width: 120px;">Fecha</th>
-                    <th class="px-5 py-3.5 font-semibold" style="max-width: 250px;">Cliente</th>
+                    <th class="px-5 py-3.5 font-semibold" style="max-width: 250px;">Cliente / Razón Social</th>
                     <th class="px-5 py-3.5 font-semibold" style="width: 100px;">Factura</th>
                     <th class="px-5 py-3.5 font-semibold" style="width: 100px;">OT</th>
                     <th class="px-5 py-3.5 font-semibold" style="width: 80px;">KG</th>
@@ -485,7 +485,10 @@ function renderExterno(dataList) {
             </td>
             <td class="px-5 py-4">
                 <div class="font-bold text-sm text-white break-words drop-shadow-md leading-tight group-hover:text-blue-200 transition-colors">
-                    ${row.cliente || '-'}
+                    ${row.razonSocial || '-'}
+                </div>
+                <div class="text-[10px] text-slate-400 font-mono mt-1">
+                    ${row.cliente ? 'RUT: ' + row.cliente : ''}
                 </div>
             </td>
             <td class="px-5 py-4 whitespace-nowrap font-mono text-slate-300 font-medium">
