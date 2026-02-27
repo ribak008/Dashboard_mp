@@ -3,7 +3,7 @@
  * Pega aquí la URL que te da Google Apps Script al hacer el despliegue de tu Web App.
  * El código de Google Apps Script TIENE QUE DEVOLVER JSON.
  */
-const API_URL = "https://script.google.com/macros/s/AKfycbxxkuXR3Jb4SsCsyol2SnrvP7RUKYZ2yxfVtNLOM5E3LAI0IPWK_qMsqOS_78auis8R/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbzIgN-89AeY5D6gM5moIbxctyiHcwIr-trzUfUDnBgrDTksdYK_kab55S_yuNFYNwao/exec";
 
 let allData = []; // Datos de despachos
 let allExternoData = []; // Datos de transporte externo
