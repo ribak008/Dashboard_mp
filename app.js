@@ -5,7 +5,9 @@
  */
 const API_URL = "https://script.google.com/macros/s/AKfycbxJtGbv6mgetMz3fWGMNU1hEXUm2A3bS7n4j0gyuThXiwR-8Oc6hfAf_XfQvHIM3XJI/exec";
 
-let allData = [];
+let allData = []; // Datos de despachos
+let allExternoData = []; // Datos de transporte externo
+let currentTab = 'despachos';
 
 document.addEventListener('DOMContentLoaded', () => {
     // 1. Inicializar iconos de Lucide
@@ -25,10 +27,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Listeners para botones e inputs
+    // 4. Listeners para botones, inputs y TABS
     document.getElementById('refreshBtn').addEventListener('click', loadData);
     document.getElementById('retryBtn').addEventListener('click', loadData);
     document.getElementById('searchInput').addEventListener('input', (e) => filterData(e.target.value));
+
+    document.getElementById('tabDespachos').addEventListener('click', () => switchTab('despachos'));
+    document.getElementById('tabExterno').addEventListener('click', () => switchTab('externo'));
 
     // 5. Autorecarga (5 minutos)
     setInterval(loadData, 300000);
@@ -37,25 +42,68 @@ document.addEventListener('DOMContentLoaded', () => {
     loadData();
 });
 
+function switchTab(tabId) {
+    currentTab = tabId;
+    const btnDespachos = document.getElementById('tabDespachos');
+    const btnExterno = document.getElementById('tabExterno');
+    const contentDespachos = document.getElementById('contentArea');
+    const contentExterno = document.getElementById('contentExterno');
+    const searchInput = document.getElementById('searchInput');
+
+    // Cambiar estilos de las pestañas
+    if (tabId === 'despachos') {
+        btnDespachos.classList.add('border-primary', 'text-white');
+        btnDespachos.classList.remove('border-transparent', 'text-slate-500');
+        btnExterno.classList.remove('border-primary', 'text-white');
+        btnExterno.classList.add('border-transparent', 'text-slate-500');
+
+        contentDespachos.classList.remove('hidden');
+        contentExterno.classList.add('hidden');
+
+        // Re-aplicar filtro actual a la pestaña correspondiente
+        filterData(searchInput.value);
+    } else {
+        btnExterno.classList.add('border-primary', 'text-white');
+        btnExterno.classList.remove('border-transparent', 'text-slate-500');
+        btnDespachos.classList.remove('border-primary', 'text-white');
+        btnDespachos.classList.add('border-transparent', 'text-slate-500');
+
+        contentExterno.classList.remove('hidden');
+        contentDespachos.classList.add('hidden');
+
+        // Re-aplicar filtro actual a la pestaña correspondiente
+        filterData(searchInput.value);
+    }
+}
+
 function setLoading(isLoading, isError = false, errorMessage = "") {
     const loadingState = document.getElementById('loadingState');
     const errorState = document.getElementById('errorState');
     const contentArea = document.getElementById('contentArea');
+    const contentExterno = document.getElementById('contentExterno');
     const errorText = document.getElementById('errorMessage');
 
     if (isLoading) {
         loadingState.classList.remove('hidden');
         errorState.classList.add('hidden');
         contentArea.classList.add('hidden');
+        contentExterno.classList.add('hidden');
     } else if (isError) {
         loadingState.classList.add('hidden');
         errorState.classList.remove('hidden');
         contentArea.classList.add('hidden');
+        contentExterno.classList.add('hidden');
         errorText.innerText = errorMessage;
     } else {
         loadingState.classList.add('hidden');
         errorState.classList.add('hidden');
-        contentArea.classList.remove('hidden');
+
+        // Solo mostramos el contenido de la pestaña activa
+        if (currentTab === 'despachos') {
+            contentArea.classList.remove('hidden');
+        } else {
+            contentExterno.classList.remove('hidden');
+        }
     }
 }
 
@@ -73,8 +121,21 @@ async function loadData() {
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
 
         const data = await response.json();
-        allData = data || [];
+
+        // Mapear compatibilidad para atrás y nueva estructura
+        if (Array.isArray(data)) {
+            // El API antiguo devolvía un array directo de despachos
+            allData = data;
+            allExternoData = [];
+        } else if (data && typeof data === 'object') {
+            // El nuevo API devuelve un diccionario
+            allData = data.despachos || [];
+            allExternoData = data.externo || [];
+        }
+
         renderData(allData);
+        renderExterno(allExternoData);
+
         setLoading(false);
 
     } catch (error) {
@@ -90,14 +151,22 @@ function filterData(query) {
     }
 
     const lowerQ = query.toLowerCase();
-    const filtered = allData.filter(item => {
-        // Busca en cualquier valor de la fila
-        return Object.values(item).some(val =>
-            String(val).toLowerCase().includes(lowerQ)
-        );
-    });
 
-    renderData(filtered);
+    if (currentTab === 'despachos') {
+        const filtered = allData.filter(item => {
+            return Object.values(item).some(val =>
+                String(val).toLowerCase().includes(lowerQ)
+            );
+        });
+        renderData(filtered);
+    } else {
+        const filtered = allExternoData.filter(item => {
+            return Object.values(item).some(val =>
+                String(val).toLowerCase().includes(lowerQ)
+            );
+        });
+        renderExterno(filtered);
+    }
 }
 
 // ============== Lógica de UI y Componentes ==============
@@ -352,5 +421,100 @@ function renderData(dataList) {
     });
 
     // Re-iniciar íconos en el DOM inyectado dinámicamente
+    lucide.createIcons();
+}
+
+// ============== Renderizado Transporte Externo ==============
+function renderExterno(dataList) {
+    const container = document.getElementById('contentExterno');
+    container.innerHTML = '';
+
+    if (dataList.length === 0) {
+        container.innerHTML = `
+            <div class="flex flex-col items-center justify-center py-20 animate-fade-in text-center">
+                <div class="bg-surface p-6 rounded-full inline-block mb-4 shadow-lg border border-border">
+                    <i data-lucide="clipboard-x" class="h-12 w-12 text-slate-500"></i>
+                </div>
+                <h3 class="text-xl font-bold text-slate-300">No hay datos de Transporte Externo</h3>
+                <p class="text-slate-500 mt-2 text-sm max-w-sm">No se encontraron registros de transporte externo hoy.</p>
+            </div>
+        `;
+        lucide.createIcons();
+        return;
+    }
+
+    const section = document.createElement('div');
+    section.className = `bg-surface/50 border border-border shadow-2xl rounded-2xl overflow-hidden glass-panel mb-8 animate-fade-in`;
+
+    const tableWrapper = document.createElement('div');
+    tableWrapper.className = 'overflow-x-auto p-0 md:p-4';
+
+    let tableHtml = `
+        <table class="w-full text-left border-collapse">
+            <thead>
+                <tr class="text-xs uppercase tracking-wider text-slate-400 bg-slate-900 border-y border-border shadow-inner">
+                    <th class="px-5 py-3.5 font-semibold text-center" style="width: 140px;">Estado</th>
+                    <th class="px-5 py-3.5 font-semibold" style="width: 120px;">Fecha</th>
+                    <th class="px-5 py-3.5 font-semibold" style="max-width: 250px;">Cliente</th>
+                    <th class="px-5 py-3.5 font-semibold" style="width: 100px;">Factura</th>
+                    <th class="px-5 py-3.5 font-semibold" style="width: 100px;">OT</th>
+                    <th class="px-5 py-3.5 font-semibold" style="width: 80px;">KG</th>
+                    <th class="px-5 py-3.5 font-semibold">Proveedor</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-border text-sm">
+    `;
+
+    dataList.forEach(row => {
+        const badgeClass = getBadgeStyles(row.estado);
+        const fechaFormat = row.fecha ? row.fecha.split(' ')[0] : '-'; // Solo tomamos la fecha
+
+        tableHtml += `
+        <tr class="hover:bg-slate-800/30 transition-colors group">
+            <td class="px-5 py-4 whitespace-nowrap">
+                <div class="flex flex-col items-center gap-2">
+                    <span class="px-3 py-1.5 rounded-lg border text-xs font-bold shadow-sm inline-block text-center w-full min-w-[110px] tracking-wide ${badgeClass}">
+                        ${row.estado || 'N/A'}
+                    </span>
+                </div>
+            </td>
+            <td class="px-5 py-4 whitespace-nowrap">
+                <div class="font-bold text-teal-400 text-sm drop-shadow-md">
+                    ${fechaFormat}
+                </div>
+            </td>
+            <td class="px-5 py-4">
+                <div class="font-bold text-sm text-white break-words drop-shadow-md leading-tight group-hover:text-blue-200 transition-colors">
+                    ${row.cliente || '-'}
+                </div>
+            </td>
+            <td class="px-5 py-4 whitespace-nowrap font-mono text-slate-300 font-medium">
+                ${row.factura || '-'}
+            </td>
+            <td class="px-5 py-4 whitespace-nowrap font-mono text-slate-300">
+                ${row.ot || '-'}
+            </td>
+            <td class="px-5 py-4 whitespace-nowrap text-amber-400 font-bold">
+                ${row.kg ? row.kg : '-'}
+            </td>
+            <td class="px-5 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2 text-slate-300">
+                    <i data-lucide="truck" class="h-4 w-4 text-indigo-400"></i>
+                    <span class="font-medium uppercase">${row.proveedor || '-'}</span>
+                </div>
+            </td>
+        </tr>
+        `;
+    });
+
+    tableHtml += `
+            </tbody>
+        </table>
+    `;
+
+    tableWrapper.innerHTML = tableHtml;
+    section.appendChild(tableWrapper);
+    container.appendChild(section);
+
     lucide.createIcons();
 }
