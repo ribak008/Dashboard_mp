@@ -3,7 +3,7 @@
  * Pega aquí la URL que te da Google Apps Script al hacer el despliegue de tu Web App.
  * El código de Google Apps Script TIENE QUE DEVOLVER JSON.
  */
-const API_URL = "https://script.google.com/macros/s/AKfycbzFnzyU626jXMLa5iKPb2RdWT-5gj97vFG5LNBJRvg1X7fW5c_Hf6a4Li7h2RU7OIMk/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbyrbtWCOHvGBLH5gwllVtpsqUjV-P3B5haVc43NYXxjSgO_-n3onRUDkLPjUujgS-Im/exec";
 
 let allData = []; // Datos de despachos
 let allExternoData = []; // Datos de transporte externo
@@ -455,11 +455,10 @@ function renderExterno(dataList) {
                 <tr class="text-xs uppercase tracking-wider text-slate-400 bg-slate-900 border-y border-border shadow-inner">
                     <th class="px-5 py-3.5 font-semibold text-center" style="width: 140px;">Estado</th>
                     <th class="px-5 py-3.5 font-semibold" style="width: 120px;">Fecha</th>
-                    <th class="px-5 py-3.5 font-semibold" style="max-width: 250px;">Cliente / Razón Social</th>
-                    <th class="px-5 py-3.5 font-semibold" style="width: 100px;">Factura</th>
-                    <th class="px-5 py-3.5 font-semibold" style="width: 100px;">OT</th>
-                    <th class="px-5 py-3.5 font-semibold" style="width: 80px;">KG</th>
-                    <th class="px-5 py-3.5 font-semibold">Proveedor</th>
+                    <th class="px-5 py-3.5 font-semibold" style="max-width: 250px;">Cliente</th>
+                    <th class="px-5 py-3.5 font-semibold" style="width: 100px;">ID Transporte</th>
+                    <th class="px-5 py-3.5 font-semibold" style="width: 80px;">Fecha Entrega</th>
+                    <th class="px-5 py-3.5 font-semibold">Transportista</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-border text-sm">
@@ -485,25 +484,19 @@ function renderExterno(dataList) {
             </td>
             <td class="px-5 py-4">
                 <div class="font-bold text-sm text-white break-words drop-shadow-md leading-tight group-hover:text-blue-200 transition-colors">
-                    ${row.razonSocial || '-'}
-                </div>
-                <div class="text-[10px] text-slate-400 font-mono mt-1">
-                    ${row.cliente ? 'RUT: ' + row.cliente : ''}
+                    ${row.cliente || '-'}
                 </div>
             </td>
             <td class="px-5 py-4 whitespace-nowrap font-mono text-slate-300 font-medium">
-                ${row.factura || '-'}
+                ${row.idTransporte || '-'}
             </td>
             <td class="px-5 py-4 whitespace-nowrap font-mono text-slate-300">
-                ${row.ot || '-'}
-            </td>
-            <td class="px-5 py-4 whitespace-nowrap text-amber-400 font-bold">
-                ${row.kg ? row.kg : '-'}
+                ${row.fechaEntrega ? row.fechaEntrega.split(' ')[0] : '-'}
             </td>
             <td class="px-5 py-4 whitespace-nowrap">
                 <div class="flex items-center gap-2 text-slate-300">
                     <i data-lucide="truck" class="h-4 w-4 text-indigo-400"></i>
-                    <span class="font-medium uppercase">${row.proveedor || '-'}</span>
+                    <span class="font-medium uppercase">${row.transportista || '-'}</span>
                 </div>
             </td>
         </tr>
