@@ -172,26 +172,43 @@ function filterData(query) {
 // ============== Lógica de UI y Componentes ==============
 
 function getBadgeStyles(statusRaw) {
-    const status = (statusRaw || "").replace(/\s+/g, ' ').trim().toUpperCase();
+    const s = (statusRaw || "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toUpperCase().trim();
 
-    switch (status) {
-        case 'PLANIFICADO':
-            return 'bg-slate-700 text-slate-200 border-slate-600';
-        case 'POR SALIR':
-            return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/50 glow-orange font-bold';
-        case 'EN RUTA':
-            return 'bg-orange-500 text-slate-900 border-orange-400 glow-orange font-bold';
-        case 'ENTREGADO':
-            return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 glow-emerald font-bold';
-        case 'PENDIENTE':
-            return 'bg-blue-500/20 text-blue-400 border-blue-500/50 glow-blue font-bold';
-        case 'RECHAZADO':
-            return 'bg-red-500/20 text-red-400 border-red-500/50 glow-red font-bold';
-        case 'FINALIZADO':
-            return 'bg-purple-500/20 text-purple-400 border-purple-500/50 font-bold';
-        default:
-            return 'bg-surface text-slate-400 border-border';
+    // Fallida / Rechazado
+    if (s.includes('FALLIDA') || s.includes('RECHAZADO') || s.includes('RECHAZADA')) {
+        return 'bg-red-500/20 text-red-400 border-red-500/50 glow-red font-bold';
     }
+    // Entregada conforme / Entregada
+    if (s.includes('ENTREGADA CONFORME') || s.includes('ENTREGADO') || s.includes('ENTREGADA')) {
+        return 'bg-emerald-500/20 text-emerald-400 border-emerald-500/50 glow-emerald font-bold';
+    }
+    // En tránsito / En reparto / En ruta
+    if (s.includes('TRANSITO') || s.includes('REPARTO') || s.includes('EN RUTA')) {
+        return 'bg-orange-500 text-slate-900 border-orange-400 glow-orange font-bold';
+    }
+    // En destino / Sucursal de destino
+    if (s.includes('DESTINO') || s.includes('SUCURSAL')) {
+        return 'bg-teal-500/20 text-teal-400 border-teal-500/50 font-bold';
+    }
+    // En origen / Ingresada en origen / proceso de creación
+    if (s.includes('ORIGEN') || s.includes('PROCESO') || s.includes('CREACION')) {
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/50 font-bold';
+    }
+    // Estados internos propios
+    if (s.includes('POR SALIR')) {
+        return 'bg-yellow-500/20 text-yellow-500 border-yellow-500/50 glow-orange font-bold';
+    }
+    if (s.includes('PENDIENTE')) {
+        return 'bg-blue-500/20 text-blue-400 border-blue-500/50 glow-blue font-bold';
+    }
+    if (s.includes('PLANIFICADO')) {
+        return 'bg-slate-700 text-slate-200 border-slate-600';
+    }
+    if (s.includes('FINALIZADO')) {
+        return 'bg-purple-500/20 text-purple-400 border-purple-500/50 font-bold';
+    }
+
+    return 'bg-surface text-slate-400 border-border';
 }
 
 function renderData(dataList) {
@@ -470,10 +487,10 @@ function renderExterno(dataList) {
 
         tableHtml += `
         <tr class="hover:bg-slate-800/30 transition-colors group">
-            <td class="px-5 py-4 whitespace-nowrap">
+            <td class="px-5 py-4" style="width:160px;">
                 <div class="flex flex-col items-center gap-2">
-                    <span class="px-3 py-1.5 rounded-lg border text-xs font-bold shadow-sm inline-block text-center w-full min-w-[110px] tracking-wide ${badgeClass}">
-                        ${row.estado || 'N/A'}
+                    <span class="px-2 py-1.5 rounded-lg border text-xs font-bold shadow-sm inline-block text-center w-full tracking-wide truncate ${badgeClass}" title="${row.estado || ''}">
+                        ${row.estado ? (row.estado.length > 22 ? row.estado.substring(0, 22) + '…' : row.estado) : 'N/A'}
                     </span>
                 </div>
             </td>
